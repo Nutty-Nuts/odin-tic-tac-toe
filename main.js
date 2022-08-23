@@ -4,7 +4,7 @@ cells.forEach((cell) => {
     cell.setAttribute("onclick", "markCell(event)");
 });
 
-const Player = (name, moves, turn) => {
+const Player = (name, moves, turn, win) => {
     const checkTurn = () => {
         return turn;
     };
@@ -14,11 +14,11 @@ const Player = (name, moves, turn) => {
     const recordMoves = (cell) => {
         moves.push(cell);
     };
-    return { name, moves, turn, checkTurn, switchTurn, recordMoves };
+    return { name, moves, turn, win, checkTurn, switchTurn, recordMoves };
 };
 
-const playerOne = Player("Player 1", [], true);
-const playerTwo = Player("Player 2", [], false);
+const playerOne = Player("Player 1", [], true, false);
+const playerTwo = Player("Player 2", [], false, false);
 
 function markCell(e) {
     const location = parseInt(e.target.getAttribute("data-cell"));
@@ -34,14 +34,22 @@ function markCell(e) {
 
             playerOne.recordMoves(location);
 
-            console.log(playerOne.moves);
+            console.log(`Player 1: ${playerOne.moves}`);
 
             playerOne.switchTurn();
             playerTwo.switchTurn();
+
+            winCondition(playerOne);
         } else {
             e.target.innerText = "O";
             playerTwo.switchTurn();
             playerOne.switchTurn();
+
+            playerTwo.recordMoves(location);
+
+            console.log(`Player 2: ${playerTwo.moves}`);
+
+            winCondition(playerTwo);
         }
     } else {
         // no moves
@@ -59,7 +67,7 @@ function checkCell(cell) {
 function winCondition(Player) {
     const winPatterns = [
         [1, 2, 3],
-        [4, 5, 5],
+        [4, 5, 6],
         [7, 8, 9],
 
         [1, 4, 7],
@@ -69,4 +77,18 @@ function winCondition(Player) {
         [1, 5, 9],
         [3, 5, 7],
     ];
+
+    let player = Player.moves;
+
+    for (i in winPatterns) {
+        let pattern = winPatterns[i];
+
+        if (
+            player.includes(pattern[0]) &&
+            player.includes(pattern[1]) &&
+            player.includes(pattern[2])
+        ) {
+            console.log(`${Player.name} Wins`);
+        }
+    }
 }
